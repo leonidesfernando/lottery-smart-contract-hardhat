@@ -7,3 +7,8 @@ cache
 typechain-types
 
 package-lock.json
+
+
+# Coverage
+coverage.json
+coverage/

@@ -20,7 +20,7 @@ describe("Lottery Tests", function () {
     
         it("Check correct the admin defined", async function () {
             await Promise.all([
-                defineAdminAndPlayers(admin)
+                defineAdmin(admin)
             ]);
             const expectedAdmin = await lottery.getAdmin();
             expect(expectedAdmin).to.be.equals(admin.address);
@@ -28,7 +28,7 @@ describe("Lottery Tests", function () {
     
         it('Check an invalid admin defined', async () => {
             await Promise.all([
-                defineAdminAndPlayers(player3)
+                defineAdmin(player3)
             ]);
             const expectedAdmin = await lottery.getAdmin();
             expect(expectedAdmin).to.not.be.equal(admin.address);
@@ -36,7 +36,7 @@ describe("Lottery Tests", function () {
     
         it('The admin cannot participate as a user in the lottery', async function () {
             await Promise.all([
-                defineAdminAndPlayers(admin)
+                defineAdmin(admin)
             ]);
     
             const array:any[] = [admin.address, player1.address];
@@ -46,7 +46,8 @@ describe("Lottery Tests", function () {
     
         it('The minimum of 3 users is required to participate in the lottery', async function () {
             await Promise.all([
-                defineAdminAndPlayers(admin),
+                setUpAdminAndPlayers(accounts),
+                defineAdmin(admin),
                 lottery.bets([player1.address,player2.address])
             ]);
             
@@ -55,7 +56,8 @@ describe("Lottery Tests", function () {
         });
     
         it('Enough number of required users to participate in the lottery', async function () {
-            await defineAdminAndPlayers(admin);
+            await setUpAdminAndPlayers(accounts)
+            await defineAdmin(admin);
             await lottery.bets([player1.address, player2.address, player3.address]);
             await lottery.pickWinner();
             const {price, roundNumber, dateTime, owner} = await lottery.getLastWinner();
@@ -63,6 +65,18 @@ describe("Lottery Tests", function () {
             expect(roundNumber).to.be.not.null
             expect(dateTime).to.be.not.null
             expect(owner).to.be.not.null
+        });
+
+        it('Check the number of players', async function () {
+            await Promise.all([
+                setUpAdminAndPlayers(accounts),
+                defineAdmin(admin)
+            ]);
+    
+            const array:any[] = [player1.address, player2.address];
+            await lottery.bets(array);
+            const numberOfPlayers:any = await lottery.numOfPlayers();
+            expect(numberOfPlayers).to.be.equal(array.length);
         });
     });
 
@@ -73,19 +87,32 @@ describe("Lottery Tests", function () {
             await Promise.all([
                 loadAccoutnsAndDeployLottery(),
                 setUpAdminAndPlayers(accounts),
-                defineAdminAndPlayers(admin),
+                defineAdmin(admin),
                 lottery.bets([player1.address,player2.address, player3.address])
             ]);
             
             await expect(lottery.getLastWinner())
                 .to.be.rejectedWith('At least one draw must be held to have a winner');
         });
+
+        it('Verifying players', async function () {
+            await Promise.all([
+                loadAccoutnsAndDeployLottery(),
+                setUpAdminAndPlayers(accounts),
+                defineAdmin(admin)
+            ]);
+    
+            const array:any[] = [player1.address, player2.address];
+            await lottery.bets(array);
+            const players = await lottery.getPlayers();
+            expect(array).to.have.members(players);
+        });
     
     });
 
 
     //Ordinary functions
-    async function defineAdminAndPlayers(myAdmin:HardhatEthersSigner) {
+    async function defineAdmin(myAdmin:HardhatEthersSigner) {
         await lottery.defineAdmin(myAdmin.address)
     }
     async function loadAccoutnsAndDeployLottery() {
