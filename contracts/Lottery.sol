@@ -90,10 +90,6 @@ contract Lottery {
     function random() private view returns(uint){
         return  uint (keccak256(abi.encode(block.timestamp,  players)));
     }
-
-    function getBalance() public view returns (uint) {
-        return address(this).balance/(10**18);
-    }
    
     function numOfPlayers() public view returns (uint) {
         return players.length;
