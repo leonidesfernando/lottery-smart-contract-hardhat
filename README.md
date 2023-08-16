@@ -12,3 +12,6 @@ This is a simple project to meet some requirements of a lottery, using the [Hard
 
 ## Test
 - `npx hardhat test`
+
+## Coverage
+- `npx hardhat coverage`
