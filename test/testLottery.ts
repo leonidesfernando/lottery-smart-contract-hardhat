@@ -20,7 +20,6 @@ describe("Lottery Tests", function () {
     
         it("Check correct the admin defined", async function () {
             await Promise.all([
-                //setUpAdminAndPlayers(accounts),
                 defineAdminAndPlayers(admin)
             ]);
             const expectedAdmin = await lottery.getAdmin();
